@@ -1,12 +1,18 @@
 {
   "name": "piggy-game",
-  "version": "0.4.0",
+  "version": "0.9.0",
   "private": true,
   "type": "module",
   "scripts": {
     "test": "node --test",
     "demo": "node scripts/demo.js",
-    "test:advanced": "node --test tests/advanced.test.js"
+    "test:advanced": "node --test tests/advanced.test.js",
+    "validate:config": "node scripts/validate-config.js",
+    "check:architecture": "node scripts/check-architecture.js",
+    "test:headless": "node --test tests/headless-smoke.test.js",
+    "smoke:headless": "node --test tests/v09.test.js",
+    "test:fixtures": "node --test tests/fixtures.test.js",
+    "headless": "node scripts/headless.js"
   },
   "engines": {
     "node": ">=20"

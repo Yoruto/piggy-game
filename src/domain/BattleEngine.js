@@ -144,7 +144,7 @@ export class BattleEngine {
     return triggersMore;
   }
   #requiredState() { if (!this.state) throw new Error('Battle not started'); return this.state; }
-  #emit(kind, payload = {}) { this.events.push({ ...payload, kind }); }
+  #emit(kind, payload = {}) { this.events.push({ ...payload, kind, seq: ++this.state.eventSequence }); }
   #error(errorCode) { return { ok: false, errorCode, snapshot: this.getSnapshot(), events: [], pendingInput: this.getPendingInput() }; }
   #result() { return { ok: true, snapshot: this.getSnapshot(), events: structuredClone(this.events), pendingInput: this.getPendingInput() }; }
   #canSwitch(side, pigId) { return pigId !== this.state.active[side] && Boolean(this.state.pig(side, pigId)?.alive); }
@@ -220,7 +220,10 @@ export class BattleEngine {
       p.sp = Math.min(p.maxSp, p.sp + regen);
       this.#emit('SpRecovered', { actorId: p.id, amount: p.sp - beforeSp });
     }
-    // Passive effects require the original v1.3 values. No invented healing here.
+    // Passive triggers after SP recovery, in player-then-enemy order.
+    for (const side of ['player', 'enemy']) {
+      this.rules.tickPassive(s.activePig(side), s.round, (kind, data) => this.#emit(kind, data));
+    }
     if (s.round % this.config.rules.resistanceRerollEveryRounds === 0) {
       for (const side of ['player', 'enemy']) {
         const p = s.activePig(side);

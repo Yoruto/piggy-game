@@ -42,7 +42,24 @@
       3,
       3.5,
       4
-    ]
+    ],
+    "inventoryCapacity": 8,
+    "rewardSkillCards": [
+      "skill.poison",
+      "skill.buff"
+    ],
+    "aiPriority": [
+      "selfLowHpGuard",
+      "targetLowHpFinish",
+      "knownWeakness",
+      "randomAffordable"
+    ],
+    "ai": {
+      "lowHpThreshold": 0.2,
+      "lowHpGuardChance": 0.3,
+      "knownWeaknessChance": 0.7,
+      "batonPassChance": 0.3
+    }
   },
   "pigs": [
     {
@@ -60,7 +77,18 @@
       ],
       "resistances": {
         "envy": "weak"
-      }
+      },
+      "passiveId": "passive.soft_fermentation",
+      "learnset": [
+        {
+          "level": 2,
+          "skillId": "skill.poison"
+        },
+        {
+          "level": 3,
+          "skillId": "skill.buff"
+        }
+      ]
     },
     {
       "id": "pig.pride",
@@ -73,6 +101,12 @@
       "speed": 10,
       "skills": [
         "skill.pride"
+      ],
+      "learnset": [
+        {
+          "level": 2,
+          "skillId": "skill.buff"
+        }
       ]
     },
     {
@@ -86,7 +120,8 @@
       "speed": 11,
       "skills": [
         "skill.envy"
-      ]
+      ],
+      "learnset": []
     },
     {
       "id": "pig.wrath",
@@ -102,7 +137,8 @@
       ],
       "resistances": {
         "sloth": "weak"
-      }
+      },
+      "learnset": []
     }
   ],
   "skills": [
@@ -278,5 +314,16 @@
       "gluttony": 1,
       "lust": 1
     }
-  }
+  },
+  "passives": [
+    {
+      "id": "passive.soft_fermentation",
+      "kind": "heal",
+      "interval": 2,
+      "amount": 5,
+      "note": "FIXTURE ONLY: interval/amount NOT from combat v1.3"
+    }
+  ],
+  "schemaVersion": 1,
+  "configVersion": "fixture-v0.9.0"
 }

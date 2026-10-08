@@ -5,6 +5,7 @@ export class BattleState {
     this.active = { player: player[0].id, enemy: enemy[0].id };
     this.round = 0;
     this.revision = 0;
+    this.eventSequence = 0;
     this.phase = 'setup';
     this.queue = [];
     this.queueIndex = 0;

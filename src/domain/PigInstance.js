@@ -22,6 +22,7 @@ export class PigInstance {
     this.status = null;
     this.stages = { attack: 0, defense: 0, speed: 0, crit: 0, spRegen: 0 };
     this.passiveId = config.passiveId ?? null;
+    this.learnset = (config.learnset ?? []).map(x => ({ ...x }));
   }
   get alive() { return this.hp > 0; }
   restore() {

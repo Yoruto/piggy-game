@@ -52,6 +52,15 @@ export class BattleRules {
     }
     return events;
   }
+  /** Passives are config-defined; fixture healing is not claimed to be v1.3. */
+  tickPassive(pig, round, emit) {
+    if (!pig.alive || !pig.passiveId) return;
+    const passive = this.config.passive(pig.passiveId);
+    if (passive.kind !== 'heal' || round % passive.interval !== 0) return;
+    const before = pig.hp;
+    pig.hp = Math.min(pig.maxHp, pig.hp + passive.amount);
+    emit('PassiveHealed', { actorId: pig.id, passiveId: pig.passiveId, amount: pig.hp - before });
+  }
   /** Chance checks are only made at well-defined boundaries for reproducible playback. */
   tickRoundStatus(pig, emit) {
     const status = pig.status;

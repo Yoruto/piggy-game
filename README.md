@@ -1,44 +1,72 @@
-# 猪猪游戏 / Piggy Game
+# 猪猪游戏 · 无界面核心原型（工程 v0.9）
 
-当前为 **原生 JavaScript（ES Modules）无界面战斗核心 v0.4.0 工程原型**，保持 MVP + Config 和 Unity/C# 风格的模块边界。HTML/CSS/DOM View **仍未开始开发**，按计划留到最后。
+这是《猪猪游戏demo文档》与《猪猪游戏架构设计文档》对应的 **原生 JavaScript ES Modules** 逻辑工程。仍然**没有 HTML、CSS、DOM View**；实际 UI 按开发版本计划最后在 v1.0 实现。
 
-## 可运行的逻辑
+> **重要：当前只有 Fixture 模拟数值。** 仓库缺少《战斗系统设计 v1.3》完整伤害公式、松软发酵被动参数、抽抗性权重及面包猪学习表；`config/demo.fixture.json` 的自定义数值仅为工程测试样例，**不得标为游戏正式数值**。
 
-- ConfigCatalog 加载/校验明确标记为 `fixture` 的 JSON、7×7 **有向**属性克制矩阵，固定种子随机源。
-- PigInstance、Inventory、GameSession，4v3 队伍、场上 1v1、速度行动队列、合法指令、SP、技能、防御、正常及强制换人、胜负。
-- 属性倍率、个体抗性（普通/弱/耐/无/反）、弱点发现与对敌方的**隐藏槽位隔离**、每 3 回合对双方当前上场猪的 7 槽重抽与已发现信息清空。
-- 暴击/弱点 → Down/1 More；每个攻击者每回合最多一次，额外行动不连续触发；敌方死亡自动换后备；弱点命中后即使敌方换人，合法的 1 More 仍保留。
-- Baton Pass：只能从 1 More 触发，本回合只能使用一次，接棒者立即行动；本次伤害加成结束后必定清除。
-- 异常状态基础逻辑：中毒、灼伤、麻痹、睡眠、冰冻、混乱（包含回合结算、行动判定与火标签解冻）；单例最多一种，默认新状态覆盖旧状态。
-- 增益/减益：攻击、防御、速度、暴击率、SP 回复各 -6～+6 档，独立生效；换人保留、战斗结束清空。
-- 敌方规则 AI：可用技能、弱点知识优先、低 HP 防御、低 HP 对手追击、1 More 概率接棒。
-- 结构化 BattleEvents、只读（脱离引用的）战斗快照、FakeView 可用的 BattlePresenter，以及 Node 自动化测试。
+## 快速开始
 
-## 尚未实现 / 非正式规则
-
-- **不是正式战斗数值**：`config/demo.fixture.json` 的猪属性、技能威力、抗性抽取池、持续回合数、Baton Pass 的 1.5x 增量与伤害/取整公式均为**工程测试 Fixture**。不要据此认为已经按《战斗系统设计 v1.3》完成数值验收。
-- **被动“松软发酵”尚未实现**：原始 v1.3 的间隔与回复数值未入仓库；待补充配置和验证用例。
-- **技能卡、升级学习、收编与奖励**、完整背包 Presenter、正式 HTML View 尚未实现。
-- **未确认规则**：换人保留异常（遵循 Demo 需求 5.2 通则）；七罪属性没有“火”，目前以技能 `tags: ['fire']` 解冻；攻击致死后不附加异常状态；伤害反弹不计算属性克制。若 v1.3 规则另有定义，需要按规范调整。
-- Demo 内抗性发现记录包含在 Snapshot 的 `knownResistances` 中，**不会**暴露隐藏抗性；AI 的知识与玩家分开记录。Domain State 内保存真实抗性。
-- 完整持续状态设计、Buff 生效时机、异常状态持续回合数等仍需待策划确认后做正式验收。
-
-## 运行（Node.js 20+，无第三方依赖）
+要求 Node.js 20+，**无外部运行依赖**：
 
 ```bash
-npm test                  # 全量核心测试
-npm run test:advanced     # 高级战斗规则测试
-npm run demo              # 自动运行 4v3 无界面战斗
+npm test
+npm run validate:config
+npm run check:architecture
+npm run test:fixtures
+npm run test:headless
+npm run smoke:headless
+npm run headless
+npm run demo
 ```
 
-主要代码位于 `src/config/`、`src/domain/`、`src/application/`、`src/presentation/`。`tests/` 使用固定随机数和独立实例，所有测试无需 DOM 或浏览器。
+`npm run headless` 显示固定种子 4v3 的完整战斗结果，`node scripts/headless.js 1` 可选择种子。`npm test` 是全部 Node 测试。以上命令均无需浏览器。CI 在 push/PR 时执行。
 
-## 逻辑和表现分离约定
+## 当前实现
 
-所有战斗状态变更只经 `BattleEngine.execute(command)`，单个命令返回 `{ok, snapshot, events, pendingInput}`；View/Presenter 只负责命令派发与事件表现，不能在页面回调里修改伤害。未来移植 Unity 时按 C# 逻辑转写同一规则，而非把 JS 代码直接复用为 Unity 程序集。JSON 配置、事件/指令语义和测试输入可以作为跨语言对照。
+| 逻辑模块 | 源码 | 职责 |
+| --- | --- | --- |
+| Config | `src/config/`、`config/demo.fixture.json` | 校验配置、只读目录、AI/被动/学习表定义 |
+| BattleState / BattleEngine | `src/domain/` | 4v3/1v1、速度行动、技能、防御/换人、死亡强制换人、胜负、Down/1 More/Baton Pass |
+| BattleRules | `src/domain/BattleRules.js` | 7×7 克制、随机抗性/反弹/发现、六种异常、五类能力等级、可配置被动回血 |
+| EnemyAI | `src/domain/EnemyAI.js` | 随机可用技能、弱点优先、低 HP 防御、接棒、敌方自动换人由 Engine 决定 |
+| Inventory / SkillLearning | `src/domain/` | 8 只背包、最多 6 技能位、技能卡消耗、升级自动学习/满位替换 |
+| GameSession | `src/application/GameSession.js` | 内存数据、开战、奖励、收编/放弃、技能卡、重置 |
+| Application Services | `src/application/` | Menu/Battle/Inventory/Reward 的用例接口 |
+| Presenters / Mapper | `src/presentation/` | 纯 JS MVP、FakeView 测试、展示投影、UI 事件队列入口 |
 
-## 文档
+技能、被动、抗性抽样、Baton Pass 倍率均通过测试配置注入。复杂回合处理保留在单写入点 `BattleEngine`；View / Presenter 不修改游戏数值。战斗事件含 `seq` 和 `kind`，供将来的 Web 或 Unity 表现层播放。
 
-- [Demo 需求](./猪猪游戏demo文档.md)
-- [架构设计](./猪猪游戏架构设计文档.md)
-- [开发版本计划](./猪猪游戏开发版本计划文档.md)
+## 范围及验收状态
+
+- **v0.5**：六种异常、能力等级、被动触发工程逻辑 + 单测；被动和取整数值**待 v1.3**。
+- **v0.6**：规则式敌方 AI、胜负完整闭环、固定种子无界面模拟。
+- **v0.7**：胜利奖励、收编或放弃、满包提示错误码、技能卡及升级学习，用例级测试。
+- **v0.8**：独立 Application Services、四类 Presenter、FakeView 生命周期/输入锁、ViewModel 不暴露未发现抗性。
+- **v0.9**：43 项 Node 测试、150 个种子对战、黄金事件 SHA-256、跨层无 UI 集成、CI、Unity 迁移契约。
+
+**以上表示完成了测试配置下的工程里程碑**，不是策划数值正式验收。详见 [`docs/ACCEPTANCE_V09.md`](./docs/ACCEPTANCE_V09.md) 和 [`docs/MIGRATION_CONTRACT.md`](./docs/MIGRATION_CONTRACT.md)。
+
+## 代码边界
+
+```text
+src/config              ← 只读规则与数据（Node 读取 JSON 的适配器在这里）
+src/domain              ← 零 DOM 的同步游戏规则；禁止 Math.random / setTimeout
+src/application         ← 会话、奖励、背包和战斗用例
+src/presentation        ← 纯 JavaScript Presenter + ViewModel，暂用 FakeView 测试
+scripts                 ← 无界面命令行工具
+tests                   ← 规则/交互/黄金事件/完整战斗的 Node 测试
+```
+
+**为什么不直接用 C#？** 目标是先用 HTML/JS 做 Web Demo；保留 Unity/C# 相近的类型职责、命令协议和 DTO。未来移植时需要将 JavaScript 规则**重写为 C#**，但可以使用同一批 JSON、种子算法与测试用例来核对结果。
+
+## 当前已知待确认
+
+1. v1.3 正式伤害公式、取整规则、猪与技能具体数值、抗性概率。
+2. 松软发酵被动真实间隔和回血量：现在 Demo Fixture 的 `interval: 2` 和 `amount: 5` 是**测试用例值**。
+3. Baton Pass 叠加/加成细节：Fixture 暂用 `1.5x`（上限 `3x`），不是策划最终公式。
+4. 需求内部中毒/灼伤“换人清除”与“异常不因换人清除”的冲突：本原型按后一条（换人保留）实现。
+5. 冰冻的“火属性技能”与七罪元素名称不一致，当前暂通过技能的 `fire` 标签判断。
+6. AI 优先级已按架构建议固定（自己低 HP 防御 → 对方低 HP 最高威力 → 已知弱点 → 随机技能）；待策划最终确认。
+7. 目前无存档/经验系统/美术与 UI，后续按开发版本计划推进。
+
+浏览 `猪猪游戏demo文档.md`、`猪猪游戏架构设计文档.md`、`猪猪游戏开发版本计划文档.md` 可查看完整需求与版本规划。
