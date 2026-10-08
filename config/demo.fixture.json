@@ -1,0 +1,26 @@
+{
+  "fixture": true,
+  "note": "TEST DATA ONLY. Pig stats, skill power and damage formula do NOT represent Battle Design v1.3.",
+  "rules": { "teamSizePlayer": 4, "teamSizeEnemy": 3, "roundSp": 5, "guardSp": 10, "critRate": 0.05, "critMultiplier": 1.5, "maxSkills": 6 },
+  "pigs": [
+    { "id": "pig.bread", "name": "面包猪", "type": "sloth", "hp": 100, "sp": 30, "attack": 10, "defense": 10, "speed": 12, "skills": ["skill.sloth", "skill.wrath"], "resistances": {"envy": "weak"} },
+    { "id": "pig.pride", "name": "傲慢猪", "type": "pride", "hp": 95, "sp": 30, "attack": 12, "defense": 9, "speed": 10, "skills": ["skill.pride"] },
+    { "id": "pig.envy", "name": "嫉妒猪", "type": "envy", "hp": 90, "sp": 35, "attack": 11, "defense": 10, "speed": 11, "skills": ["skill.envy"] },
+    { "id": "pig.wrath", "name": "暴怒猪", "type": "wrath", "hp": 110, "sp": 25, "attack": 13, "defense": 10, "speed": 9, "skills": ["skill.wrath"], "resistances": {"sloth": "weak"} }
+  ],
+  "skills": [
+    { "id": "skill.sloth", "type": "sloth", "power": 25, "spCost": 5 },
+    { "id": "skill.pride", "type": "pride", "power": 22, "spCost": 6 },
+    { "id": "skill.envy", "type": "envy", "power": 20, "spCost": 5 },
+    { "id": "skill.wrath", "type": "wrath", "power": 28, "spCost": 7 }
+  ],
+  "affinity": {
+    "pride":    {"pride":1,"envy":1,"wrath":1,"sloth":1,"greed":1,"gluttony":1.5,"lust":1.5},
+    "envy":     {"pride":1.5,"envy":1,"wrath":1,"sloth":1,"greed":1.5,"gluttony":1,"lust":1},
+    "wrath":    {"pride":1,"envy":1.5,"wrath":1,"sloth":1.5,"greed":1,"gluttony":1,"lust":1},
+    "sloth":    {"pride":1.5,"envy":1,"wrath":1.5,"sloth":1,"greed":1,"gluttony":1,"lust":1},
+    "greed":    {"pride":1,"envy":1,"wrath":1,"sloth":1.5,"greed":1,"gluttony":1.5,"lust":1},
+    "gluttony": {"pride":1,"envy":1.5,"wrath":1,"sloth":1.5,"greed":1,"gluttony":1,"lust":1},
+    "lust":     {"pride":1,"envy":1,"wrath":1.5,"sloth":1,"greed":1.5,"gluttony":1,"lust":1}
+  }
+}

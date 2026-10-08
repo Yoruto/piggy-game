@@ -1,0 +1,11 @@
+{
+  "name": "piggy-game",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "demo": "node scripts/demo.js"
+  },
+  "engines": { "node": ">=20" }
+}
