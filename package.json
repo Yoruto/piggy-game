@@ -1,6 +1,6 @@
 {
   "name": "piggy-game",
-  "version": "0.9.0",
+  "version": "1.0.0-beta.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,7 +12,9 @@
     "test:headless": "node --test tests/headless-smoke.test.js",
     "smoke:headless": "node --test tests/v09.test.js",
     "test:fixtures": "node --test tests/fixtures.test.js",
-    "headless": "node scripts/headless.js"
+    "headless": "node scripts/headless.js",
+    "dev": "node scripts/serve.js",
+    "test:web": "node --test tests/web/*.test.js"
   },
   "engines": {
     "node": ">=20"
