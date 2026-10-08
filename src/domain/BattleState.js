@@ -1,4 +1,4 @@
-/** The engine is the only writer; snapshots are detached read-only JSON data. */
+/** The engine is the only writer. Snapshots contain only discovered resistances, never hidden slots. */
 export class BattleState {
   constructor(player, enemy) {
     this.teams = { player, enemy };
@@ -10,7 +10,10 @@ export class BattleState {
     this.queueIndex = 0;
     this.extra = null;
     this.usedMore = new Set();
+    this.usedBatonPass = false;
+    this.pass = null;
     this.pendingSwitch = null;
+    this.knownResistances = { player: {}, enemy: {} };
     this.outcome = null;
   }
   pig(side, id) { return this.teams[side].find(p => p.id === id); }
@@ -19,11 +22,14 @@ export class BattleState {
   snapshot() {
     return structuredClone({ round: this.round, revision: this.revision, phase: this.phase,
       active: this.active, queue: this.queue, queueIndex: this.queueIndex,
-      extra: this.extra, outcome: this.outcome,
+      extra: this.extra, usedBatonPass: this.usedBatonPass, pass: this.pass,
+      pendingSwitch: this.pendingSwitch, outcome: this.outcome,
+      knownResistances: this.knownResistances,
       teams: Object.fromEntries(Object.entries(this.teams).map(([side, pigs]) => [side, pigs.map(p => ({
         id: p.id, configId: p.configId, name: p.name, type: p.type, level: p.level,
         hp: p.hp, maxHp: p.maxHp, sp: p.sp, maxSp: p.maxSp, speed: p.speed,
-        skills: [...p.skills], down: p.down, guarding: p.guarding, switchShield: p.switchShield
+        skills: [...p.skills], down: p.down, guarding: p.guarding, switchShield: p.switchShield,
+        status: p.status, stages: p.stages
       }))])) });
   }
 }

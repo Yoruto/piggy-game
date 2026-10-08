@@ -19,7 +19,15 @@ export class PigInstance {
     this.guarding = false;
     this.switchShield = false;
     this.resistances = { ...(config.resistances ?? {}) };
+    this.status = null;
+    this.stages = { attack: 0, defense: 0, speed: 0, crit: 0, spRegen: 0 };
+    this.passiveId = config.passiveId ?? null;
   }
   get alive() { return this.hp > 0; }
-  restore() { this.hp = this.maxHp; this.sp = this.maxSp; this.down = false; this.guarding = false; this.switchShield = false; }
+  restore() {
+    this.hp = this.maxHp; this.sp = this.maxSp;
+    this.down = false; this.guarding = false; this.switchShield = false;
+    this.status = null;
+    for (const key of Object.keys(this.stages)) this.stages[key] = 0;
+  }
 }
